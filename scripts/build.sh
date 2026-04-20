@@ -1,6 +1,7 @@
 #!/bin/bash
 set -euo pipefail
 
+COMPONENT=kubeadm
 UPSTREAM_OWNER=kubernetes
 UPSTREAM_REPO=kubernetes
 VERSION="${1}"
@@ -19,7 +20,7 @@ mkdir -p "${DISTS}/${VERSION}" "${SRCS}"
 # 👇 用户自定义构建逻辑 (示例)
 # ==========================================
 
-echo "🔧 Compiling ${UPSTREAM_OWNER}/${UPSTREAM_REPO} ${VERSION}..."
+echo "🔧 Compiling ${UPSTREAM_OWNER}/${UPSTREAM_REPO}:${COMPONENT} ${VERSION}..."
 
 # 1. 准备阶段：安装依赖、下载代码、应用补丁等
 prepare()
@@ -37,7 +38,7 @@ build()
     echo "🔨 [Build] Compiling source code..."
     
     pushd "${SRCS}/${VERSION}"
-    make all WHAT=cmd/kubeadm GOFLAGS=-v GOGCFLAGS="-N -l"
+    make all WHAT=cmd/${COMPONENT} GOFLAGS=-v GOGCFLAGS="-N -l"
     popd
 
     echo "✅ [Build] Compilation finished."
@@ -48,8 +49,8 @@ post_build()
 {
     echo "📦 [Post-Build] Organizing artifacts..."
     
-    local PRODUCT="${DISTS}/${VERSION}/kubeadm"
-    cp "${SRCS}/${VERSION}/_output/local/go/bin/kubeadm" "${PRODUCT}"
+    local PRODUCT="${DISTS}/${VERSION}/${COMPONENT}"
+    cp "${SRCS}/${VERSION}/_output/local/go/bin/${COMPONENT}" "${PRODUCT}"
     chown -R "${HOST_UID}:${HOST_GID}" "${DISTS}" "${SRCS}"
 
     echo "✅ [Post-Build] Artifacts ready in ./dists/${VERSION}."
