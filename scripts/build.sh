@@ -50,6 +50,7 @@ post_build()
     
     local PRODUCT="${DISTS}/${VERSION}/kubeadm"
     cp "${SRCS}/${VERSION}/_output/local/go/bin/kubeadm" "${PRODUCT}"
+    chown -R "${HOST_UID}:${HOST_GID}" "${DISTS}" "${SRCS}"
 
     echo "✅ [Post-Build] Artifacts ready in ./dists/${VERSION}."
 }
